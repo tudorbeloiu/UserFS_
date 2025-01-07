@@ -2,7 +2,15 @@
 
 root_dir="$HOME/rootDirectory"
 raport="$HOME/dailyReport"
+lockfile="/tmp/ufs_lockfile.lock"
+raport_lockfile="$raport/raport_lockfile.lock"
 
+if [[ -e "$lockfile" ]]; then
+    echo "Scriptul este deja in executie:
+    exit 1
+fi
+
+touch "$lockfile"
 
 
 read -p "Numarul de procese pentru care un utilizator devine suspicios: " numproc
@@ -82,12 +90,12 @@ adaugare_user(){
 
 generare_raport(){
 
-   lockfile="$raport/raport_zilnic.lock"
-   if [[ -e "$lockfile" ]]; then
-      echo "Fisierul de raport este deja in proces de actualizare."
-      return 0
+   if [[ -e "$raport_lockfile" ]]; then
+      echo "Raportul este deja in proces de generare!"
+      return
    fi
-   touch "$lockfile"
+
+   touch "$raport_lockfile"
 
 
    mkdir -p "$raport"
@@ -165,8 +173,8 @@ generare_raport(){
 
    echo "------------------------------" >> "$raport/raport_zilnic"
 
+   rm -f "$raport_lockfile"
 
-   rm -f "$lockfile"
 }
 
 
@@ -181,10 +189,12 @@ generare_raport
 while true
 do
   ora=$(date +"%H:%M")
-  if [[ "$ora" == "14:56" ]]
+  if [[ "$ora" == "15:13" ]]
   then
     generare_raport
     sleep 60
   fi
-  sleep 50
+  sleep 10
 done &
+
+rm -f "$lockfile"
