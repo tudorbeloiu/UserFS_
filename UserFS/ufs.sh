@@ -54,7 +54,6 @@ adaugare_user(){
      mkdir -p "$user_directory"
 
      if [[ ! -f "$user_directory/all_procs" ]]; then
-        echo "Creare fisier all_procs pentru $user"
         echo "" > "$user_directory/all_procs"
      fi
 
@@ -82,6 +81,15 @@ adaugare_user(){
 }
 
 generare_raport(){
+
+   lockfile="$raport/raport_zilnic.lock"
+   if [[ -e "$lockfile" ]]; then
+      echo "Fisierul de raport este deja in proces de actualizare."
+      return 0
+   fi
+   touch "$lockfile"
+
+
    mkdir -p "$raport"
    zi_crt=$(date +"%Y-%m-%d")
    echo "Raportul pentru ziua $zi_crt " > "$raport/raport_zilnic"
@@ -157,6 +165,8 @@ generare_raport(){
 
    echo "------------------------------" >> "$raport/raport_zilnic"
 
+
+   rm -f "$lockfile"
 }
 
 
@@ -171,7 +181,7 @@ generare_raport
 while true
 do
   ora=$(date +"%H:%M")
-  if [[ "$ora" == "14:45" ]]
+  if [[ "$ora" == "14:56" ]]
   then
     generare_raport
     sleep 60
