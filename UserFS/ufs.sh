@@ -2,16 +2,7 @@
 
 root_dir="$HOME/rootDirectory"
 raport="$HOME/dailyReport"
-lockfile="/tmp/ufs_lockfile.lock"
-raport_lockfile="$raport/raport_lockfile.lock"
-
-if [[ -e "$lockfile" ]]; then
-    echo "Scriptul este deja in executie:
-    exit 1
-fi
-
-touch "$lockfile"
-
+raport_lockfile="$raport/raport_lockfile.loc"
 
 read -p "Numarul de procese pentru care un utilizator devine suspicios: " numproc
 
@@ -189,7 +180,7 @@ generare_raport
 while true
 do
   ora=$(date +"%H:%M")
-  if [[ "$ora" == "15:13" ]]
+  if [[ "$ora" == "15:31" ]]
   then
     generare_raport
     sleep 60
@@ -197,4 +188,3 @@ do
   sleep 10
 done &
 
-rm -f "$lockfile"
