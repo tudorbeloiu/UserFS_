@@ -3,23 +3,6 @@
 root_dir="$HOME/rootDirectory"
 raport="$HOME/dailyReport"
 
-read -p "Numarul de procese cele mai active: " num
-
-if [[ -z "$num" ]]
-then
-  echo "Mod de utilizare: Introdu un numar valid format doar din cifre de la 0 la 9"
-  exit 1
-fi
-
-
-if ! [[ "$num" =~ ^[0-9]+$ ]]
-then
-  echo "Eroare! Numarul specificat nu este corect!"
-  echo "Mod de utilizare: Introdu un numar valid format doar din cifre de la 0 la 9"
-  exit 1
-fi
-
-
 
 
 read -p "Numarul de procese pentru care un utilizator devine suspicios: " numproc
@@ -111,6 +94,34 @@ generare_raport(){
    done
    echo "Numarul de utilizatori activi: $counter " >> "$raport/raport_zilnic"
 
+
+
+   max_freq=0
+   max_freq_procs=()
+   for user_directory in "$root_dir"/*
+   do
+     if [[ -d "$user_directory" ]]
+     then
+        while read -r line
+        do
+           freq=$(echo $line | awk '{print $1}')
+           proc=$(echo $line | awk '{print $2}')
+
+           if (( freq > max_freq )); then
+              max_freq=$freq
+              max_freq_procs=("$proc")
+           elif (( freq == max_freq )); then
+              max_freq_procs+=("$proc")
+           fi
+        done < "$user_directory/all_procs"
+     fi
+   done
+   echo "Procesele cu frecventa maxima : " >> "$raport/raport_zilnic"
+   for proc in "${max_freq_procs[@]}"
+   do
+      echo "$proc cu frecventa $max_freq" >> "$raport/raport_zilnic"
+   done
+   echo "-------------------------------" >> "$raport/raport_zilnic"
 }
 
 
@@ -124,7 +135,7 @@ done &
 while true
 do
   ora=$(date +"%H:%M")
-  if [[ "$ora" == "13:12" ]]
+  if [[ "$ora" == "13:43" ]]
   then
     generare_raport
     sleep 60
