@@ -100,12 +100,15 @@ generare_raport(){
    max_sum_proc_v=()
    max_freq=0
    max_freq_procs=()
+
+   utilizatori_suspecti=()
    for user_directory in "$root_dir"/*
    do
      if [[ -d "$user_directory" ]]
      then
         user_sum_proc=0
         user=$(basename "$user_directory")
+
         while read -r line
         do
            freq=$(echo $line | awk '{print $1}')
@@ -128,6 +131,9 @@ generare_raport(){
           max_sum_proc=$user_sum_proc
           max_sum_proc_v+=("$user")
        fi
+       if (( user_sum_proc > numproc )); then
+         utilizatori_suspecti+=("$user")
+       fi
      fi
    done
    echo "Procesele cu frecventa maxima : " >> "$raport/raport_zilnic"
@@ -143,6 +149,13 @@ generare_raport(){
      echo "$user cu $max_sum_proc procese" >> "$raport/raport_zilnic"
    done
    echo "------------------------------" >> "$raport/raport_zilnic"
+   echo "Utilizatori cu un numar suspect de procese: " >> "$raport/raport_zilnic"
+   for user in "${utilizatori_suspecti[@]}"
+   do
+      echo "$user" >> "$raport/raport_zilnic"
+   done
+
+   echo "------------------------------" >> "$raport/raport_zilnic"
 
 }
 
@@ -153,11 +166,12 @@ do
   sleep 30
 done &
 
+generare_raport
 
 while true
 do
   ora=$(date +"%H:%M")
-  if [[ "$ora" == "14:19" ]]
+  if [[ "$ora" == "14:45" ]]
   then
     generare_raport
     sleep 60
