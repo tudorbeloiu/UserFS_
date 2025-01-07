@@ -107,10 +107,11 @@ generare_raport(){
            freq=$(echo $line | awk '{print $1}')
            proc=$(echo $line | awk '{print $2}')
 
-           if (( freq > max_freq )); then
+           if (( freq >= max_freq )); then
+              if (( freq > max_freq)); then
+                 max_freq_procs=()
+              fi
               max_freq=$freq
-              max_freq_procs=("$proc")
-           elif (( freq == max_freq )); then
               max_freq_procs+=("$proc")
            fi
         done < "$user_directory/all_procs"
@@ -135,7 +136,7 @@ done &
 while true
 do
   ora=$(date +"%H:%M")
-  if [[ "$ora" == "13:43" ]]
+  if [[ "$ora" == "14:03" ]]
   then
     generare_raport
     sleep 60
